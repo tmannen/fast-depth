@@ -18,7 +18,7 @@ class NYUDataset(MyDataloader):
         elif self.split == 'holdout':
             return ('00001.h5' in filename or '00201.h5' in filename)
         elif self.split == 'val':
-            return (filename.endswith('.h5'))
+            return (filename.endswith('.h5') or filename.endswith('.png'))
         else:
             raise (RuntimeError("Invalid dataset split: " + split + "\n"
                                 "Supported dataset splits are: train, val"))

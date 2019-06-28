@@ -2,6 +2,7 @@ import os
 import os.path
 import numpy as np
 import torch.utils.data as data
+from PIL import Image
 import h5py
 import dataloaders.transforms as transforms
 
@@ -12,6 +13,11 @@ def h5_loader(path):
     depth = np.array(h5f['depth'])
     return rgb, depth
 
+def rgb_depth_loader(path):
+    rgb = np.array(Image.open(path))
+    depth = np.zeros_like(rgb)
+    return rgb, depth
+
 # def rgb2grayscale(rgb):
 #     return rgb[:,:,0] * 0.2989 + rgb[:,:,1] * 0.587 + rgb[:,:,2] * 0.114
 
@@ -19,7 +25,7 @@ class MyDataloader(data.Dataset):
     modality_names = ['rgb']
 
     def is_image_file(self, filename):
-        IMG_EXTENSIONS = ['.h5']
+        IMG_EXTENSIONS = ['.h5', '.png']
         return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
     def find_classes(self, dir):
@@ -45,7 +51,7 @@ class MyDataloader(data.Dataset):
 
     color_jitter = transforms.ColorJitter(0.4, 0.4, 0.4)
 
-    def __init__(self, root, split, modality='rgb', loader=h5_loader):
+    def __init__(self, root, split, modality='rgb', loader=rgb_depth_loader):
         classes, class_to_idx = self.find_classes(root)
         imgs = self.make_dataset(root, class_to_idx)
         assert len(imgs)>0, "Found 0 images in subfolders of: " + root + "\n"
@@ -85,6 +91,8 @@ class MyDataloader(data.Dataset):
         """
         path, target = self.imgs[index]
         rgb, depth = self.loader(path)
+        print(path)
+        print(rgb.shape)
         return rgb, depth
 
     def __getitem__(self, index):

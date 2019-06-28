@@ -28,7 +28,8 @@ def main():
 
     # Data loading code
     print("=> creating data loaders...")
-    valdir = os.path.join('..', 'data', args.data, 'val')
+    # Test - change later
+    valdir = os.path.join('..', 'data', 'bcs_floor6_play_only_formatted/images', 'val')
 
     if args.data == 'nyudepthv2':
         from dataloaders.nyu import NYUDataset
@@ -66,6 +67,8 @@ def validate(val_loader, model, epoch, write_to_file=True):
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
         input, target = input.cuda(), target.cuda()
+        #print(input.shape)
+        #print(target.shape)
         # torch.cuda.synchronize()
         data_time = time.time() - end
 
@@ -73,6 +76,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
         end = time.time()
         with torch.no_grad():
             pred = model(input)
+        print("pred.shape: ", pred.shape)
         # torch.cuda.synchronize()
         gpu_time = time.time() - end
 
