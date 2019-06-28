@@ -13,11 +13,6 @@ def h5_loader(path):
     depth = np.array(h5f['depth'])
     return rgb, depth
 
-def rgb_depth_loader(path):
-    rgb = np.array(Image.open(path))
-    # Depth only has one channel other wise same as image right?
-    depth = np.zeros((rgb.shape[:2]) + (1,))
-    return rgb, depth
 
 # def rgb2grayscale(rgb):
 #     return rgb[:,:,0] * 0.2989 + rgb[:,:,1] * 0.587 + rgb[:,:,2] * 0.114
@@ -52,7 +47,7 @@ class MyDataloader(data.Dataset):
 
     color_jitter = transforms.ColorJitter(0.4, 0.4, 0.4)
 
-    def __init__(self, root, split, modality='rgb', loader=rgb_depth_loader):
+    def __init__(self, root, split, modality='rgb', loader=h5_loader):
         classes, class_to_idx = self.find_classes(root)
         imgs = self.make_dataset(root, class_to_idx)
         assert len(imgs)>0, "Found 0 images in subfolders of: " + root + "\n"
@@ -92,8 +87,6 @@ class MyDataloader(data.Dataset):
         """
         path, target = self.imgs[index]
         rgb, depth = self.loader(path)
-        print(path)
-        print(rgb.shape)
         return rgb, depth
 
     def __getitem__(self, index):

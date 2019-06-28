@@ -10,7 +10,7 @@ cmap = plt.cm.viridis
 
 
 def parse_command():
-    data_names = ['nyudepthv2']
+    data_names = ['nyudepthv2', 'sun3d']
 
     from dataloaders.dataloader import MyDataloader
     modality_names = MyDataloader.modality_names

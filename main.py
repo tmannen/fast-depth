@@ -28,14 +28,15 @@ def main():
 
     # Data loading code
     print("=> creating data loaders...")
-    # Test - change later
-    valdir = os.path.join('..', 'data', 'bcs_floor6_play_only_formatted/images', 'val')
+    # TODO: Test - change later
+    valdir = os.path.join('..', 'data', 'bcs_floor6_play_only_formatted', 'images')
 
     if args.data == 'nyudepthv2':
         from dataloaders.nyu import NYUDataset
         val_dataset = NYUDataset(valdir, split='val', modality=args.modality)
-    else:
-        raise RuntimeError('Dataset not found.')
+    elif args.data == 'sun3d':
+        from dataloaders.sun3d import Sun3DDataset
+        val_dataset = Sun3DDataset(valdir, split='val', modality=args.modality)
 
     # set batch size to be 1 for validation
     val_loader = torch.utils.data.DataLoader(val_dataset,
@@ -67,8 +68,6 @@ def validate(val_loader, model, epoch, write_to_file=True):
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
         input, target = input.cuda(), target.cuda()
-        #print(input.shape)
-        #print(target.shape)
         # torch.cuda.synchronize()
         data_time = time.time() - end
 
@@ -76,7 +75,6 @@ def validate(val_loader, model, epoch, write_to_file=True):
         end = time.time()
         with torch.no_grad():
             pred = model(input)
-        print("pred.shape: ", pred.shape)
         # torch.cuda.synchronize()
         gpu_time = time.time() - end
 
@@ -87,7 +85,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
         end = time.time()
 
         # save 8 images for visualization
-        skip = 50
+        skip = 10
 
         if args.modality == 'rgb':
             rgb = input

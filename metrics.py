@@ -30,8 +30,6 @@ class Result(object):
 
     def evaluate(self, output, target):
         valid_mask = ((target>0) + (output>0)) > 0
-        print(valid_mask.shape)
-        # TODO: why weird shape?
         output = 1e3 * output[valid_mask]
         target = 1e3 * target[valid_mask]
         abs_diff = (output - target).abs()
