@@ -15,7 +15,8 @@ def h5_loader(path):
 
 def rgb_depth_loader(path):
     rgb = np.array(Image.open(path))
-    depth = np.zeros_like(rgb)
+    # Depth only has one channel other wise same as image right?
+    depth = np.zeros((rgb.shape[:2]) + (1,))
     return rgb, depth
 
 # def rgb2grayscale(rgb):
