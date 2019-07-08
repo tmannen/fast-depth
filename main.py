@@ -53,6 +53,7 @@ def main():
             args.start_epoch = checkpoint['epoch']
             best_result = checkpoint['best_result']
             model = checkpoint['model']
+            print(model)
             print("=> loaded best model (epoch {})".format(checkpoint['epoch']))
         else:
             model = checkpoint
@@ -96,6 +97,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
             row = utils.merge_into_row(rgb, target, pred)
             img_merge = utils.add_row(img_merge, row)
         elif i == 8*skip:
+            # TODO: write it so all images are written and then use ffmpeg to get a video?
             filename = output_directory + '/comparison_' + str(epoch) + '.png'
             utils.save_image(img_merge, filename)
 

@@ -81,3 +81,5 @@ def add_row(img_merge, row):
 def save_image(img_merge, filename):
     img_merge = Image.fromarray(img_merge.astype('uint8'))
     img_merge.save(filename)
+
+############################ UTILS FOR HOU YUXIN PAPER ##################################

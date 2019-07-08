@@ -674,6 +674,7 @@ class MobileNetSkipAdd(nn.Module):
         for i in range(14):
             setattr( self, 'conv{}'.format(i), mobilenet.model[i])
 
+        # TODO: separate to encoder and decoder? the gaussian prior thing, add before this somehow?
         kernel_size = 5
         # self.decode_conv1 = conv(1024, 512, kernel_size)
         # self.decode_conv2 = conv(512, 256, kernel_size)
