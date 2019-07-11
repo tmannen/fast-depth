@@ -14,7 +14,6 @@ from metrics import AverageMeter, Result
 import utils
 
 args = utils.parse_command()
-print(args)
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu # Set the GPU.
 
 fieldnames = ['rmse', 'mae', 'delta1', 'absrel',
@@ -53,7 +52,6 @@ def main():
             args.start_epoch = checkpoint['epoch']
             best_result = checkpoint['best_result']
             model = checkpoint['model']
-            print(model)
             print("=> loaded best model (epoch {})".format(checkpoint['epoch']))
         else:
             model = checkpoint
@@ -62,6 +60,11 @@ def main():
         validate(val_loader, model, args.start_epoch, write_to_file=False)
         return
 
+def save_prediction(img, path, img_name):
+    pred_dir = os.path.join(path, "predictions")
+    os.makedirs(pred_dir, exist_ok=True)
+    image_path = os.path.join(pred_dir, img_name)
+    utils.save_image(img, image_path)
 
 def validate(val_loader, model, epoch, write_to_file=True):
     average_meter = AverageMeter()
@@ -100,6 +103,10 @@ def validate(val_loader, model, epoch, write_to_file=True):
             # TODO: write it so all images are written and then use ffmpeg to get a video?
             filename = output_directory + '/comparison_' + str(epoch) + '.png'
             utils.save_image(img_merge, filename)
+
+        rgb_img, target_img, pred_img = utils.merge_into_row(rgb, target, pred, separate=True)
+        row = utils.merge_into_row(rgb, target, pred)
+        save_prediction(row, output_directory, str(i) + ".png")
 
         if (i+1) % args.print_freq == 0:
             print('Test: [{0}/{1}]\t'

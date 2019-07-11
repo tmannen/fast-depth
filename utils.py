@@ -28,6 +28,9 @@ def parse_command():
                         metavar='N', help='print frequency (default: 50)')
     parser.add_argument('-e', '--evaluate', default='', type=str, metavar='PATH',)
     parser.add_argument('--gpu', default='0', type=str, metavar='N', help="gpu id")
+    #parser.add_argument('--eval_path', default='0', type=str, metavar='N', help="gpu id") # Evaluate one sequence
+    #parser.add_argument('--eval_path', default='0', type=str, metavar='N', help="gpu id")
+
     parser.set_defaults(cuda=True)
 
     args = parser.parse_args()
@@ -43,7 +46,7 @@ def colored_depthmap(depth, d_min=None, d_max=None):
     return 255 * cmap(depth_relative)[:,:,:3] # H, W, C
 
 
-def merge_into_row(input, depth_target, depth_pred):
+def merge_into_row(input, depth_target, depth_pred, separate=False):
     rgb = 255 * np.transpose(np.squeeze(input.cpu().numpy()), (1,2,0)) # H, W, C
     depth_target_cpu = np.squeeze(depth_target.cpu().numpy())
     depth_pred_cpu = np.squeeze(depth_pred.data.cpu().numpy())
@@ -52,10 +55,12 @@ def merge_into_row(input, depth_target, depth_pred):
     d_max = max(np.max(depth_target_cpu), np.max(depth_pred_cpu))
     depth_target_col = colored_depthmap(depth_target_cpu, d_min, d_max)
     depth_pred_col = colored_depthmap(depth_pred_cpu, d_min, d_max)
+    if separate:
+        return rgb, depth_target_col, depth_pred_col
+
     img_merge = np.hstack([rgb, depth_target_col, depth_pred_col])
     
     return img_merge
-
 
 def merge_into_row_with_gt(input, depth_input, depth_target, depth_pred):
     rgb = 255 * np.transpose(np.squeeze(input.cpu().numpy()), (1,2,0)) # H, W, C
