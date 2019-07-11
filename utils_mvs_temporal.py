@@ -26,6 +26,7 @@ def pose_distance_measure(poses):
     return distances
 
 def matern_kernel(distances):
+    # TODO: try the mobilenet encoder on a sequence and apply this kernel to the encoded image?
     # These should be trainable right? Values from paper for now
     gamma = 13.82
     l = 1.098
