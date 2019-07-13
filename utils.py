@@ -17,6 +17,7 @@ def parse_command():
 
     import argparse
     parser = argparse.ArgumentParser(description='FastDepth')
+    # More like 'data type' in my case -Teemu (sun3d and nyu different formats)
     parser.add_argument('--data', metavar='DATA', default='nyudepthv2',
                         choices=data_names,
                         help='dataset: ' + ' | '.join(data_names) + ' (default: nyudepthv2)')
@@ -27,9 +28,9 @@ def parse_command():
     parser.add_argument('--print-freq', '-p', default=50, type=int,
                         metavar='N', help='print frequency (default: 50)')
     parser.add_argument('-e', '--evaluate', default='', type=str, metavar='PATH',)
+    parser.add_argument('-t', '--train', default='', type=str, metavar='TRAIN',)
     parser.add_argument('--gpu', default='0', type=str, metavar='N', help="gpu id")
-    #parser.add_argument('--eval_path', default='0', type=str, metavar='N', help="gpu id") # Evaluate one sequence
-    #parser.add_argument('--eval_path', default='0', type=str, metavar='N', help="gpu id")
+    parser.add_argument('--test_path', metavar='TESTPATH') # Test some sequence
 
     parser.set_defaults(cuda=True)
 

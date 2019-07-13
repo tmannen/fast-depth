@@ -28,14 +28,15 @@ def main():
     # Data loading code
     print("=> creating data loaders...")
     # TODO: Test - change later
-    valdir = os.path.join('..', 'data', 'bcs_floor6_play_only_formatted', 'images')
+    valdir = os.path.join('..', 'data', args.data, 'val')
+    testdir = args.test_path
 
     if args.data == 'nyudepthv2':
         from dataloaders.nyu import NYUDataset
         val_dataset = NYUDataset(valdir, split='val', modality=args.modality)
     elif args.data == 'sun3d':
         from dataloaders.sun3d import Sun3DDataset
-        val_dataset = Sun3DDataset(valdir, split='val', modality=args.modality)
+        val_dataset = Sun3DDataset(testdir, split='val', modality=args.modality)
 
     # set batch size to be 1 for validation
     val_loader = torch.utils.data.DataLoader(val_dataset,
@@ -57,6 +58,17 @@ def main():
             model = checkpoint
             args.start_epoch = 0
         output_directory = os.path.dirname(args.evaluate)
+        validate(val_loader, model, args.start_epoch, write_to_file=False)
+        return
+
+    # Train from start
+    if args.train:
+        assert os.path.isfile(args.train), \
+        "=> no model found at '{}'".format(args.train)
+        print("=> loading model '{}'".format(args.train))
+        model = models.MobileNetSkipAdd(output_size=10)
+        args.start_epoch = 0
+        output_directory = os.path.dirname(args.train)
         validate(val_loader, model, args.start_epoch, write_to_file=False)
         return
 
@@ -100,7 +112,6 @@ def validate(val_loader, model, epoch, write_to_file=True):
             row = utils.merge_into_row(rgb, target, pred)
             img_merge = utils.add_row(img_merge, row)
         elif i == 8*skip:
-            # TODO: write it so all images are written and then use ffmpeg to get a video?
             filename = output_directory + '/comparison_' + str(epoch) + '.png'
             utils.save_image(img_merge, filename)
 
@@ -136,6 +147,8 @@ def validate(val_loader, model, epoch, write_to_file=True):
                 'mae': avg.mae, 'delta1': avg.delta1, 'delta2': avg.delta2, 'delta3': avg.delta3,
                 'data_time': avg.data_time, 'gpu_time': avg.gpu_time})
     return avg, img_merge
+
+#def train()
 
 if __name__ == '__main__':
     main()
