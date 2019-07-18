@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def pose_distance_measure(poses):
     """
@@ -33,7 +34,7 @@ def matern_kernel(distances):
     return gamma**2 * (1 + (np.sqrt(3)*distances/l)) * np.exp(-(np.sqrt(3)*distances/l))
 
 def get_camera_values(path):
-    K = np.loadtxt(path)
-    poses = np.loadtxt(path)
+    K = np.loadtxt(os.path.join(path, "K.txt"))
+    poses = np.loadtxt(os.path.join(path, "poses.txt"))
     poses.shape = (poses.shape[0], 4, 4)
     return K, poses
