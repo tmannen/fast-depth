@@ -7,16 +7,20 @@ from dataloaders.dataloader import MyDataloader
 
 iheight, iwidth = 480, 640 # raw image size
 
-def rgb_depth_loader(path):
+def sun3d_loader(path):
     rgb = np.array(Image.open(path))
     # Just expect depth to be in the same root as images folder and use image path to get depth?
     depth = np.load(path.replace("images", "depth").replace("png", "npy"))
-    return rgb, depth
+    pose = np.load(path.replace("images", "poses").replace("png", "npy"))
+    pose.shape = (4, 4)
+    K = np.loadtxt(os.path.join(path, "K.txt"))
+
+    return rgb, depth, pose, K
 
 class Sun3DDataset(MyDataloader):
     def __init__(self, root, split, modality='rgb'):
         self.split = split
-        super(Sun3DDataset, self).__init__(root, split, modality, loader=rgb_depth_loader)
+        super(Sun3DDataset, self).__init__(root, split, modality, loader=sun3d_loader)
         self.output_size = (224, 224)
 
     def make_dataset(self, dir, class_to_idx):
@@ -34,7 +38,7 @@ class Sun3DDataset(MyDataloader):
         return images
 
     # Copied from NYUDataset - correct?
-    def train_transform(self, rgb, depth):
+    def train_transform(self, rgb, depth, pose):
         s = np.random.uniform(1.0, 1.5) # random scaling
         depth_np = depth / s
         angle = np.random.uniform(-5.0, 5.0) # random rotation degrees
@@ -56,7 +60,7 @@ class Sun3DDataset(MyDataloader):
 
         return rgb_np, depth_np
 
-    def val_transform(self, rgb, depth):
+    def val_transform(self, rgb, depth, pose):
         depth_np = depth
         transform = transforms.Compose([
             transforms.Resize(250.0 / iheight),
