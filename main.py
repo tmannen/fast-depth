@@ -48,7 +48,7 @@ def main():
         assert os.path.isfile(args.evaluate), \
         "=> no model found at '{}'".format(args.evaluate)
         print("=> loading model '{}'".format(args.evaluate))
-        checkpoint = torch.load(args.evaluate)
+        checkpoint = torch.load(args.evaluate, map_location='cpu')
         if type(checkpoint) is dict:
             args.start_epoch = checkpoint['epoch']
             best_result = checkpoint['best_result']
@@ -82,8 +82,9 @@ def validate(val_loader, model, epoch, write_to_file=True):
     average_meter = AverageMeter()
     model.eval() # switch to evaluate mode
     end = time.time()
-    for i, (input, target) in enumerate(val_loader):
-        input, target = input.cuda(), target.cuda()
+    for i, (input, target, pose) in enumerate(val_loader):
+        print(pose)
+        input, target = input, target
         # torch.cuda.synchronize()
         data_time = time.time() - end
 

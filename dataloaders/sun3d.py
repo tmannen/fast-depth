@@ -13,9 +13,9 @@ def sun3d_loader(path):
     depth = np.load(path.replace("images", "depth").replace("png", "npy"))
     pose = np.load(path.replace("images", "poses").replace("png", "npy"))
     pose.shape = (4, 4)
-    K = np.loadtxt(os.path.join(path, "K.txt"))
+    #K = np.loadtxt(os.path.join(path, "K.txt"))
 
-    return rgb, depth, pose, K
+    return rgb, depth, pose#, K
 
 class Sun3DDataset(MyDataloader):
     def __init__(self, root, split, modality='rgb'):
@@ -58,7 +58,7 @@ class Sun3DDataset(MyDataloader):
         rgb_np = np.asfarray(rgb_np, dtype='float') / 255
         depth_np = transform(depth_np)
 
-        return rgb_np, depth_np
+        return rgb_np, depth_np, pose
 
     def val_transform(self, rgb, depth, pose):
         depth_np = depth
@@ -71,4 +71,4 @@ class Sun3DDataset(MyDataloader):
         rgb_np = np.asfarray(rgb_np, dtype='float') / 255
         depth_np = transform(depth_np)
 
-        return rgb_np, depth_np
+        return rgb_np, depth_np, pose

@@ -86,13 +86,13 @@ class MyDataloader(data.Dataset):
             tuple: (rgb, depth) the raw data.
         """
         path, target = self.imgs[index]
-        rgb, depth = self.loader(path)
-        return rgb, depth
+        rgb, depth, pose = self.loader(path)
+        return rgb, depth, pose
 
     def __getitem__(self, index):
-        rgb, depth = self.__getraw__(index)
+        rgb, depth, pose = self.__getraw__(index)
         if self.transform is not None:
-            rgb_np, depth_np = self.transform(rgb, depth)
+            rgb_np, depth_np, pose = self.transform(rgb, depth, pose)
         else:
             raise(RuntimeError("transform not defined"))
 
@@ -107,10 +107,10 @@ class MyDataloader(data.Dataset):
         input_tensor = to_tensor(input_np)
         while input_tensor.dim() < 3:
             input_tensor = input_tensor.unsqueeze(0)
-        depth_tensor = to_tensor(depth_np)
-        depth_tensor = depth_tensor.unsqueeze(0)
+        depth_tensor = to_tensor(depth_np).unsqueeze(0)
+        pose_tensor = to_tensor(pose).unsqueeze(0)
 
-        return input_tensor, depth_tensor
+        return input_tensor, depth_tensor, pose_tensor
 
     def __len__(self):
         return len(self.imgs)
