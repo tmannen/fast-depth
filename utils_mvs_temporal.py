@@ -28,7 +28,6 @@ def pose_distance_measure(poses):
     return distances
 
 def matern_kernel(distances):
-    # TODO: try the mobilenet encoder on a sequence and apply this kernel to the encoded image?
     # These should be trainable right? Values from paper for now
     gamma = 13.82
     l = 1.098
@@ -49,6 +48,7 @@ def pose_distance_measure_torch(poses):
     """
 
     distances = torch.zeros((poses.shape[0], poses.shape[0]))
+    print("in function:", poses.shape)
 
     for idx in range(poses.shape[0]):
         # Can the for loop be vectorised away?
@@ -58,6 +58,7 @@ def pose_distance_measure_torch(poses):
 
         r_j = poses[idx, :3, :3]
         r_is = poses[:, :3, :3]
+        # use permute to transpose r_is
         tr_in = r_is.permute(0,2,1).matmul(r_j)
         tr_calc = torch.zeros(tr_in.shape[0])
         for idx2 in range(tr_in.shape[0]):
@@ -69,7 +70,6 @@ def pose_distance_measure_torch(poses):
     return distances
 
 def matern_kernel_torch(distances):
-    # TODO: try the mobilenet encoder on a sequence and apply this kernel to the encoded image?
     # These should be trainable right? Values from paper for now
     gamma = torch.tensor(13.82)
     l = torch.tensor(1.098)

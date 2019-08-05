@@ -108,7 +108,7 @@ class MyDataloader(data.Dataset):
         while input_tensor.dim() < 3:
             input_tensor = input_tensor.unsqueeze(0)
         depth_tensor = to_tensor(depth_np).unsqueeze(0)
-        pose_tensor = to_tensor(pose).unsqueeze(0)
+        pose_tensor = to_tensor(pose)#.unsqueeze(0)
 
         return input_tensor, depth_tensor, pose_tensor
 
