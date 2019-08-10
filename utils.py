@@ -31,6 +31,7 @@ def parse_command():
     parser.add_argument('-t', '--train', default='', type=str, metavar='TRAIN',)
     parser.add_argument('--gpu', default='0', type=str, metavar='N', help="gpu id")
     parser.add_argument('--test_path', metavar='TESTPATH') # Test some sequence
+    parser.add_argument('--train_path', metavar='TRAINPATH')  # Train on sequences
 
     parser.set_defaults(cuda=True)
 

@@ -48,7 +48,6 @@ def pose_distance_measure_torch(poses):
     """
 
     distances = torch.zeros((poses.shape[0], poses.shape[0]))
-    print("in function:", poses.shape)
 
     for idx in range(poses.shape[0]):
         # Can the for loop be vectorised away?

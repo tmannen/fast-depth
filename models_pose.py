@@ -32,7 +32,6 @@ class MobileNetSkipAddAlt(nn.Module):
         for i in range(14):
             setattr( self, 'conv{}'.format(i), mobilenet.model[i])
 
-        # TODO: separate to encoder and decoder? the gaussian prior thing, add before this somehow?
         kernel_size = 5
         # self.decode_conv1 = conv(1024, 512, kernel_size)
         # self.decode_conv2 = conv(512, 256, kernel_size)
@@ -77,13 +76,12 @@ class MobileNetSkipAddAlt(nn.Module):
             elif i==5:
                 x3 = x
 
-        #TODO: actually test this
+        # Add the GP here.
         distances = pose_distance_measure_torch(poses)
         kernel_output = matern_kernel_torch(distances)
         original_shape = x.shape
         x = kernel_output.mm(x.flatten(start_dim=1)).reshape(original_shape)
 
-        # TODO: add kernel thing here?
         for i in range(1,6):
             layer = getattr(self, 'decode_conv{}'.format(i))
             x = layer(x)

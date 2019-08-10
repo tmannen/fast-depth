@@ -32,20 +32,17 @@ def main():
     # TODO: Test - change later
     valdir = os.path.join('..', 'data', args.data, 'val')
     testdir = args.test_path
+    traindir = args.train_path
 
-    if args.data == 'nyudepthv2':
-        from dataloaders.nyu import NYUDataset
-        val_dataset = NYUDataset(valdir, split='val', modality=args.modality)
-    elif args.data == 'sun3d':
+    if args.data == 'sun3d':
         from dataloaders.sun3d import Sun3DDataset
         val_dataset = Sun3DDataset(testdir, split='val', modality=args.modality)
+        train_dataset = Sun3DDataset(traindir, split='train', modality=args.modality)
 
-    # set batch size to be 1 for validation
     val_loader = torch.utils.data.DataLoader(val_dataset,
-        batch_size=1, shuffle=False, num_workers=args.workers, pin_memory=True)
-    # change val_dataset when training
-    train_loader = torch.utils.data.DataLoader(val_dataset,
-                                             batch_size=4, shuffle=False, num_workers=args.workers, pin_memory=True)
+        batch_size=4, shuffle=False, num_workers=args.workers, pin_memory=True)
+    train_loader = torch.utils.data.DataLoader(train_dataset,
+                                             batch_size=1   , shuffle=False, num_workers=args.workers, pin_memory=True)
     print("=> data loaders created.")
 
     # evaluation mode
@@ -85,7 +82,7 @@ def validate(val_loader, model, epoch, write_to_file=True):
     model.eval() # switch to evaluate mode
     end = time.time()
     for i, (input, target, pose) in enumerate(val_loader):
-        #input, target = input, target
+        #input, target, pose = input.cuda(), target.cuda(), pose.cuda()
         # torch.cuda.synchronize()
         data_time = time.time() - end
 
