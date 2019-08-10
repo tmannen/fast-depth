@@ -14,6 +14,7 @@ import models
 import models_pose
 from metrics import AverageMeter, Result
 import utils
+from dataloaders.sun3d import Sun3DDataset
 
 args = utils.parse_command()
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu # Set the GPU.
@@ -34,22 +35,14 @@ def main():
     testdir = args.test_path
     traindir = args.train_path
 
-    if args.data == 'sun3d':
-        from dataloaders.sun3d import Sun3DDataset
-        val_dataset = Sun3DDataset(testdir, split='val', modality=args.modality)
-        train_dataset = Sun3DDataset(traindir, split='train', modality=args.modality)
-
-    val_loader = torch.utils.data.DataLoader(val_dataset,
-        batch_size=4, shuffle=False, num_workers=args.workers, pin_memory=True)
-    train_loader = torch.utils.data.DataLoader(train_dataset,
-                                             batch_size=1   , shuffle=False, num_workers=args.workers, pin_memory=True)
-    print("=> data loaders created.")
-
     # evaluation mode
     if args.evaluate:
         assert os.path.isfile(args.evaluate), \
         "=> no model found at '{}'".format(args.evaluate)
         print("=> loading model '{}'".format(args.evaluate))
+        val_dataset = Sun3DDataset(testdir, split='val', modality=args.modality)
+        val_loader = torch.utils.data.DataLoader(val_dataset,
+                                                 batch_size=4, shuffle=False, num_workers=args.workers, pin_memory=True)
         checkpoint = torch.load(args.evaluate, map_location='cpu')
         if type(checkpoint) is dict:
             args.start_epoch = checkpoint['epoch']
@@ -65,6 +58,9 @@ def main():
 
     # Train from start
     if args.train:
+        train_dataset = Sun3DDataset(traindir, split='train', modality=args.modality)
+        train_loader = torch.utils.data.DataLoader(train_dataset,
+                                                   batch_size=1, shuffle=False, num_workers=args.workers, pin_memory=True)
         model = models_pose.MobileNetSkipAddAlt(10)
         args.start_epoch = 0
         output_directory = os.path.dirname(args.train)
@@ -151,6 +147,7 @@ def train(train_loader, model, epoch):
     criterion = nn.MSELoss()
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0001)
     # TODO: continue from here, test if training works
+    print("Starting training loop")
     for i, (input, target, pose) in enumerate(train_loader):
         optimizer.zero_grad()
         output = model(input, pose)
