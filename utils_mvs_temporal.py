@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import torch
+torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 def pose_distance_measure(poses):
     """

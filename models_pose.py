@@ -97,44 +97,17 @@ class MobileNetSkipAddAlt(nn.Module):
         return x
 
 class AugmentedFastDepth(nn.Module):
-    model = torch.load("../models/mobilenet-nnconv5dw-skipadd-pruned.pth.tar", map_location='cpu')
     def __init__(self, model_path):
         # TODO: mimic function above for this just use the pretrained?
-        super(AugmentedFastDepth, self).__init__()
-        self.output_size = output_size
-        mobilenet = imagenet.mobilenet.MobileNet()
-
+        super().__init__()
+        pretrained_fd = torch.load("../models/mobilenet-nnconv5dw-skipadd-pruned.pth.tar")
         for i in range(14):
-            setattr( self, 'conv{}'.format(i), mobilenet.model[i])
-
-        kernel_size = 5
-        # self.decode_conv1 = conv(1024, 512, kernel_size)
-        # self.decode_conv2 = conv(512, 256, kernel_size)
-        # self.decode_conv3 = conv(256, 128, kernel_size)
-        # self.decode_conv4 = conv(128, 64, kernel_size)
-        # self.decode_conv5 = conv(64, 32, kernel_size)
-        self.decode_conv1 = nn.Sequential(
-            depthwise(1024, kernel_size),
-            pointwise(1024, 512))
-        self.decode_conv2 = nn.Sequential(
-            depthwise(512, kernel_size),
-            pointwise(512, 256))
-        self.decode_conv3 = nn.Sequential(
-            depthwise(256, kernel_size),
-            pointwise(256, 128))
-        self.decode_conv4 = nn.Sequential(
-            depthwise(128, kernel_size),
-            pointwise(128, 64))
-        self.decode_conv5 = nn.Sequential(
-            depthwise(64, kernel_size),
-            pointwise(64, 32))
-        self.decode_conv6 = pointwise(32, 1)
-        weights_init(self.decode_conv1)
-        weights_init(self.decode_conv2)
-        weights_init(self.decode_conv3)
-        weights_init(self.decode_conv4)
-        weights_init(self.decode_conv5)
-        weights_init(self.decode_conv6)
+            # Copy layers from pretrained and add to this class? this the best way to do it?
+            layer = getattr(pretrained_fd['model'], 'conv{}'.format(i))
+            setattr(self, 'conv{}'.format(i), layer)
+        for i in range(1,7):
+            layer = getattr(pretrained_fd['model'], 'decode_conv{}'.format(i))
+            setattr(self, 'decode_conv{}'.format(i), layer)
 
     def forward(self, x, poses):
         # skip connections: dec4: enc1
